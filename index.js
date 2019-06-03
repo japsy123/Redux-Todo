@@ -6,7 +6,7 @@ function todos (state = [], action) {
     return state
   }
 
-function createStore () {
+function createStore (reducer) {
     // 1. the state
     // 2. get the state
     // 3. listen for state
@@ -26,6 +26,10 @@ function createStore () {
         }
     }
 
+    function dispatch(action) {
+        state = reducer(state,action)
+        listeners.forEach((l)=> l())
+    }
     return {
         getState,
         subscribe
