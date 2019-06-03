@@ -7,11 +7,15 @@ function createStore () {
 
     let state;
     const getState () => state;
-    let listener = [];
+    let listeners = [];
 
     const subscribe = (listener) => {
 
-        listener.push(listener)
+        listeners.push(listener)
+
+        return () => {
+            listeners = listeners.filter( (l) => l !== listener)
+        }
     }
 
     return {
@@ -19,3 +23,11 @@ function createStore () {
         subscribe
     }
 }
+
+const store = createStore()
+
+const unsubscribe = store.subscribe(function () {
+    console.log("state called")
+})
+
+unsubscribe();
