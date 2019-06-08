@@ -120,7 +120,12 @@
       function List(props) {
         return (
           <ul>
-            <li>LIST</li>
+            {props.items.map(item => (
+              <li key={item.id}>
+                <span>{item.name}</span>
+                <button onClick={() => props.remove(item)}>X</button>
+              </li>
+            ))}
           </ul>
         );
       }
@@ -133,7 +138,7 @@
           const name = this.input.value;
           this.input.value = "";
           this.props.store.dispatch(
-            addGoalAction({
+            addTodoAction({
               name,
               complete: false,
               id: generateId()
@@ -153,7 +158,7 @@
               />
               <button onClick={this.addItem}>Add Todo</button>
 
-              <List />
+              <List items={this.props.todos} />
             </div>
           );
         }
@@ -164,7 +169,7 @@
           const name = this.input.value;
           this.input.value = "";
           this.props.store.dispatch(
-            addTodoAction({
+            addGoalAction({
               name,
               complete: false,
               id: generateId()
@@ -184,7 +189,7 @@
               />
               <button onClick={this.addItem}>Add Goal</button>
 
-              <List />
+              <List items={this.props.goals} />
             </div>
           );
         }
