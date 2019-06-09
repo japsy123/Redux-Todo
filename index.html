@@ -6,6 +6,7 @@
     <script src="https://unpkg.com/react@16.3.0-alpha.1/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@16.3.0-alpha.1/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <script src="https://tylermcginnis.com/goals-todos-api/index.js"></script>
   </head>
 
   <body>
@@ -25,7 +26,15 @@
       const TOGGLE_TODO = "TOGGLE_TODO";
       const ADD_GOAL = "ADD_GOAL";
       const REMOVE_GOAL = "REMOVE_GOAL";
+      const RECEIVE_DATA = "RECEIVE_DATA";
 
+      function receiveDataAction(todos, goals) {
+        return {
+          type: RECEIVE_DATA,
+          todos,
+          goals
+        };
+      }
       function addTodoAction(todo) {
         return {
           type: ADD_TODO,
@@ -75,6 +84,8 @@
                     complete: !todo.complete
                   })
             );
+          case RECEIVE_DATA:
+            return action.todos;
           default:
             return state;
         }
@@ -86,6 +97,8 @@
             return state.concat([action.goal]);
           case REMOVE_GOAL:
             return state.filter(goal => goal.id !== action.id);
+          case RECEIVE_DATA:
+            return action.goals;
           default:
             return state;
         }
@@ -145,6 +158,9 @@
             })
           );
         };
+        removeItem = todo => {
+          this.props.store.dispatch(removeTodoAction(todo.id));
+        };
         render() {
           return (
             <div>
@@ -158,7 +174,7 @@
               />
               <button onClick={this.addItem}>Add Todo</button>
 
-              <List items={this.props.todos} />
+              <List items={this.props.todos} remove={this.removeItem} />
             </div>
           );
         }
@@ -176,6 +192,9 @@
             })
           );
         };
+        removeItem = goal => {
+          this.props.store.dispatch(removeGoalAction(goal.id));
+        };
         render() {
           return (
             <div>
@@ -189,7 +208,7 @@
               />
               <button onClick={this.addItem}>Add Goal</button>
 
-              <List items={this.props.goals} />
+              <List items={this.props.goals} remove={this.removeItem} />
             </div>
           );
         }
@@ -198,6 +217,12 @@
         componentDidMount() {
           const { store } = this.props;
           store.subscribe(() => this.forceUpdate());
+
+          Promise.all([API.fetchTodos(), API.fetchGoals()]).then(
+            ([todos, goals]) => {
+              store.dispatch(receiveDataAction(todos, goals));
+            }
+          );
         }
 
         render() {
